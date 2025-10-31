@@ -1,6 +1,7 @@
 // server.js
 import express from 'express';
 import dotenv from 'dotenv';
+import routes from '../src/routes/taskRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -9,29 +10,15 @@ const PORT = process.env.PORT || 5000;
 // Middlewere
 app.use(express.json());
 
-const URL = 'https://jsonplaceholder.typicode.com'
+
+// Routes
+app.use('/api/tasks', routes);
+
+// Home Page
 
 app.get('/', (req, res) => {
-  res.send('My WebPage');
-})
-
-app.get(`/posts`, async (req, res) => {
-  try {
-    const response = await fetch('https://jsonplaceholder.typicode.com/posts');
-    
-    if (!response.ok) {
-      throw new Error('External Error');
-    }
-
-    const posts = await response.json();
-    res.json(posts); // send has response 
-
-
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json({error: 'Failed'});
-  }
-})
+  res.send('<h1> Matias Web Page </h1>')
+});
 
 
 // Start Server
