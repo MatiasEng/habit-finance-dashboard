@@ -81,7 +81,7 @@ router.get('/', requireAuth, requireAdmin, getAllUsers);
 
 | URL| Method | Body | Expected |
 |----|--------|------|----------|
-|auth/register|POST|"{ ""email"": ""a@a.com"", ""password"": ""123"" }"|201|
+|auth/register|POST|"{ ""email"": ""<a@a.com>"", ""password"": ""123"" }"|201|
 |/auth/login|POST|same|"{ token: ""abc123"" }"|
 |/api/users/me|GET|Header: Authorization: abc123|200|
 |/api/users|GET|same + admin|200|
