@@ -1,21 +1,22 @@
 // src/routes/taskRoutes.js
 import express from 'express';
 import {
-  getAllTasks,
+  getTasks,
   getTask,
   createTask,
   updateTask,
-  deleteTask
+  deleteTask,
 } from '../controllers/taskController.js';
 
 const router = express.Router();
 
-// GET - /api/tasks
-router.get('/', getAllTasks);
-
 
 // GET - /api/tasks/:id
 router.get('/:id', getTask);
+
+// GET - /api/tasks
+router.get('/', getTasks)
+
 
 // POST - /api/tasks
 router.post('/', createTask);

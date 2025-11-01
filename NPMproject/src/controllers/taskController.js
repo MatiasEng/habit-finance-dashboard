@@ -6,16 +6,11 @@ const taksStructure = {
   completed: false
 }
 
-tasks.push({id: 1, title: "Task 1", completed: false});
+tasks.push({id: 1, title: "Task 1: work", completed: true});
 tasks.push({id: 2, title: "Task 2", completed: false});
-tasks.push({id: 3, title: "Task 3", completed: false});
-tasks.push({id: 4, title: "Task 4", completed: false});
-tasks.push({id: 5, title: "Task 5", completed: false});
-
-// READ
-function getAllTasks(req, res) {
-  res.json(tasks);
-}
+tasks.push({id: 3, title: "Task 3", completed: true});
+tasks.push({id: 4, title: "Task 4: work", completed: false});
+tasks.push({id: 5, title: "Task 5", completed: true});
 
 // READ
 function getTask(req, res) {
@@ -26,6 +21,50 @@ function getTask(req, res) {
     return res.status(404).json({error: "Task not found"});
   }
   res.json(task);
+}
+
+// READ
+function getTasks(req, res) {
+
+  let { search, status, limit} = req.query;
+
+  if (search === undefined && status === undefined && limit === undefined) {
+    return res.json(tasks);
+  }
+  
+  let results = [...tasks]; // copy of the tasks
+  
+  if (search !== undefined) {
+    search = search.toLowerCase(); // turn the search into lowercase
+    results = results.filter(t => t.title.toLowerCase().includes(search));
+  }
+  
+  if (status !== undefined) {
+    status = status.toLowerCase();
+    results = results.filter(t => String(t.completed) === status);
+  }
+  
+  if (results.length === 0) {
+    return res.status(404).json({error: "No tasks found"});
+  }
+  
+  if (limit !== undefined) {
+    if (isNaN(limit)) { 
+      return res.status(400).json({error: "Limit must be number"});
+    } 
+    
+    limit = parseInt(limit);
+    
+    if (limit <= 0 ) {
+      return res.status(400).json({error: "Limit must be greather than 0"});
+    }
+
+    if (limit <= results.length) return res.json(results.slice(0, limit));
+  }
+
+  res.json(results);
+  
+
 }
 
 // CREATE
@@ -75,4 +114,4 @@ const deleteTask = (req, res) => {
   res.status(204).send();
 }
 
-export { getAllTasks, getTask, createTask, updateTask, deleteTask }
+export { getTasks, getTask, createTask, updateTask, deleteTask }
