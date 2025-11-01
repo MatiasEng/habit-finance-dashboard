@@ -8,6 +8,10 @@ import {
   deleteTask,
 } from '../controllers/taskController.js';
 
+import { validateTask } from '../middlewere/validateTask.js'
+
+import { requireAuth } from '../middlewere/auth.js'
+
 const router = express.Router();
 
 
@@ -19,12 +23,12 @@ router.get('/', getTasks)
 
 
 // POST - /api/tasks
-router.post('/', createTask);
+router.post('/', validateTask, createTask);
 
 // PUT - /api/tasks/:id
 router.put('/:id', updateTask);
 
 // DELETE - /api/tasks/:id
-router.delete('/:id', deleteTask);
+router.delete('/:id',requireAuth, deleteTask);
 
 export default router;
