@@ -1,7 +1,9 @@
 // server.js
 import express from 'express';
 import dotenv from 'dotenv';
-import routes from '../src/routes/taskRoutes.js';
+import taskRoutes from '../src/routes/taskRoutes.js';
+import userRoutes from '../src/routes/userRoutes.js'
+import authRoutes from '../src/routes/authRoutes.js'
 import { errorHandler } from './middlewere/errorHandler.js';
 
 const app = express();
@@ -18,7 +20,10 @@ app.use((req, res, next) => {
 });
 
 // Routes
-app.use('/api/tasks', routes);
+app.use('/api/tasks', taskRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/auth', authRoutes);
+
 
 // Home Page
 app.get('/', (req, res) => {

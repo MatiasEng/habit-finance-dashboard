@@ -10,7 +10,6 @@ import {
 
 import { validateTask } from '../middlewere/validateTask.js'
 
-import { requireAuth } from '../middlewere/auth.js'
 
 const router = express.Router();
 
@@ -29,6 +28,7 @@ router.post('/', validateTask, createTask);
 router.put('/:id', updateTask);
 
 // DELETE - /api/tasks/:id
-router.delete('/:id',requireAuth, deleteTask);
+// Fix the authentication
+router.delete('/:id', deleteTask);
 
 export default router;

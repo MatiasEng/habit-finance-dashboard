@@ -1,13 +1,4 @@
 /*
-// routes/userRoutes.js
-const router = express.Router();
-
-// GET /api/users          → Get all users (admin only)
-router.get('/', getAllUsers);
-
-// GET /api/users/me       → Get my profile
-router.get('/me', requireAuth, getMyProfile);
-
 // GET /api/users/:id      → Get user by ID
 router.get('/:id', requireAuth, getUserById);
 
@@ -22,3 +13,15 @@ router.delete('/:id', requireAuth, requireAdmin, deleteUser);
 
 export default router;
 */
+import express from 'express';
+import { requireAuth } from '../middlewere/requireAuth.js';
+import {requireAdmin} from '../middlewere/requireAdmin.js'
+import { getMyProfile, getAllUsers} from '../controllers/userController.js'
+
+const userRoutes = express.Router();
+
+userRoutes.get('/me', requireAuth, getMyProfile);
+userRoutes.get('/', requireAuth, requireAdmin, getAllUsers);
+
+
+export default userRoutes;
