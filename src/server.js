@@ -19,11 +19,11 @@ app.use(express.json());
 app.use(logger);
 
 // Routes
-app.use('/api/users', usersRoutes)
-app.use('/api/habits', habitsRoutes)
+app.use('/api/users', usersRoutes) // done
+app.use('/api/habits', habitsRoutes) // done
 app.use('/api/expenses', expensesRoutes)
 app.use('/api/dashboard', dashboardRoutes)
-app.use('/api/auth', authRoutes)
+app.use('/api/auth', authRoutes) // only logout remaining
 
 // Home Page Landing
 app.get('/', (req, res) => {
