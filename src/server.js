@@ -1,3 +1,4 @@
+// require('crypto').randomBytes(64).toString('hex')
 import express from 'express';
 import dotenv from 'dotenv';
 

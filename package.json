@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "The Habit & Finance Dashboard is full stack web application designed to help users track their dayly habits and personal finances in one unified platform.",
   "main": "src/server.js",
-  "type":"module",
+  "type": "module",
   "scripts": {
-    "dev": "nodemon --env-file=.env src/server.js"
+    "dev": "nodemon -L --env-file=.env src/server.js"
   },
   "repository": {
     "type": "git",
@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "dotenv": "^17.2.3",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2"
   }
 }

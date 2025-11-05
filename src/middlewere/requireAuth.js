@@ -1,24 +1,36 @@
 import users from '../data/users.js';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+
+const ACCESS_TOKEN = process.env.ACCESS_TOKEN;
 
 function requireAuth(req, res, next) {
   const authHeader = req.headers.authorization;
+  console.log(authHeader);
   
   if (!authHeader || !authHeader.startsWith('Bearer ')) return res.status(401).json({error: "Token require"});
   
   const token = authHeader.split(' ')[1];
   
-  // Verify the JWT
-  if (!token.startsWith('fake-jwt-')) return res.status(400).json({error: "Invalid Token"});
-  
-  const userId = token.split('-')[2];
 
-  const user = users.find(u => u.id == userId);
+  try {
+    const payload = jwt.verify(token, ACCESS_TOKEN);
   
-  if (!user) return res.status(404).json({error: "User Not Found"});
-  
-  req.user = user;
-  
-  next();
+    const userId = payload.userId;
+    
+    const user = users.find(u => u.id === userId);
+    
+
+    // Verify the JWT
+    req.user = user;
+    next();
+
+  } catch (err) {
+    console.error(err.name);
+    if (err.name === 'TokenExpiredError') return res.status(401).json({error: "Token is expired"});
+    res.status(401).json({error: "Invalid Access Token"});
+    
+  }
 
 }
 
