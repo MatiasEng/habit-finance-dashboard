@@ -95,7 +95,9 @@ function deleteOneHabit(req, res) {
   let habit = userHabits[habitId-1];
   if (!habit) return res.status(404).json({error: "Habit Not Found"});
   
-  habits.splice(habitId-1, 1);
+  const habitIndex = habits.findIndex(h => h.id === habit.id);
+  
+  habits.splice(habitIndex, 1);
   res.json({message: "Habit Deleted", habit: habit})
 }
 
