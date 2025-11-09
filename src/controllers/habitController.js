@@ -36,6 +36,7 @@ function createHabit(req, res) {
     createdAt: getCurrentDate()
   }
   
+  nextId++;
   habits.push(newHabit);
   res.status(201).json(newHabit);
   

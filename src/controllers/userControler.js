@@ -19,6 +19,8 @@ function updateProfile(req, res) {
   user.email = email ?? user.email;
   user.password = password ?? user.password;
   
+  res.json({user});
+  
 }
 
 function deleteAccount(req, res) {

@@ -46,7 +46,7 @@ function loginUser(req, res) {
   let userId = user.id;
   let userEmail = user.email;
   
-  const accessToken = jwt.sign({userId, userEmail}, ACCESS_TOKEN, {expiresIn: '30m'});
+  const accessToken = jwt.sign({userId, userEmail}, ACCESS_TOKEN, {expiresIn: '1h'});
   const refreshToken = jwt.sign({userId, userEmail}, REFRESH_TOKEN, {expiresIn: '1d'});
   
   refreshTokens.push(refreshToken);

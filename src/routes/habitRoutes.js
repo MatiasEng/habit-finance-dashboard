@@ -6,7 +6,7 @@ const router = express.Router();
 
 
 router.get('/', requireAuth, getHabits);
-router.post('/', requireAuth, createHabit);
+router.post('/', requireAuth, createHabit); // create base on userId
 router.get('/:id', requireAuth, getOneHabit);
 router.put('/:id', requireAuth, updateOneHabit);
 router.delete('/:id', requireAuth, deleteOneHabit);

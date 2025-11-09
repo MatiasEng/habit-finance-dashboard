@@ -1,5 +1,7 @@
 import expenses from '../data/expenses.js';
+
 let nextId = expenses.length+1;
+
 
 function getExpenses(req, res) {
   const userId = req.user.id;
@@ -33,6 +35,7 @@ function addExpense(req, res) {
     createdAt: getCurrentDate() 
   }
   
+  nextId++;
   expenses.push(newExpense);
   res.status(201).json(newExpense);
 
