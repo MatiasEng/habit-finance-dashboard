@@ -1,6 +1,7 @@
 // require('crypto').randomBytes(64).toString('hex')
 import express from 'express';
 import dotenv from 'dotenv';
+import connectDB from './db/connect.js';
 
 // Middlewere
 import logger from './middlewere/logger.js';
@@ -14,6 +15,7 @@ import authRoutes from '../src/routes/authRoutes.js';
 
 
 const app = express();
+dotenv.config();
 const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
@@ -33,6 +35,11 @@ app.get('/', (req, res) => {
 
 
 // Start Server
-app.listen(PORT, () => {
-  console.log(`Server Running on PORT ${PORT}`);
-});
+async function startServer() {
+  await connectDB();
+  app.listen(PORT, () => {
+    console.log(`Server Running on PORT ${PORT}`);
+  });
+}
+
+startServer();
