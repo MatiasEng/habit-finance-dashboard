@@ -13,6 +13,8 @@ import expensesRoutes from '../src/routes/expenseRoutes.js'
 import dashboardRoutes from '../src/routes/dashboardRoutes.js'
 import authRoutes from '../src/routes/authRoutes.js';
 
+import testRoutes from '../src/routes/testDB.js';
+
 
 const app = express();
 dotenv.config();
@@ -22,11 +24,12 @@ app.use(express.json());
 app.use(logger);
 
 // Routes
-app.use('/api/users', usersRoutes) // done
-app.use('/api/habits', habitsRoutes) // done
-app.use('/api/expenses', expensesRoutes)
-app.use('/api/dashboard', dashboardRoutes)
-app.use('/api/auth', authRoutes) // only logout remaining
+app.use('/api/users', usersRoutes);
+app.use('/api/habits', habitsRoutes); 
+app.use('/api/expenses', expensesRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/auth', authRoutes); 
+app.use('/api/test', testRoutes);
 
 // Home Page Landing
 app.get('/', (req, res) => {

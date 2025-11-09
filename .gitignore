@@ -8,3 +8,7 @@ node_modules/
 # Logs
 
 # Runtime Data
+
+# Test
+src/routes/testDB.js
+src/controllers/testController.js
