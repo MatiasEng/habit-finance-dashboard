@@ -4,17 +4,17 @@ const habitSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    require: true
+    required: true
   },
   title: {
     type: String,
-    require: true,
+    required: true,
     maxlength: 20
 
   },
   category: {
     type: String,
-    require: true,
+    required: true,
     maxlength: 20
 
   },
@@ -34,21 +34,10 @@ const habitSchema = new mongoose.Schema({
   },
   createdAt:{
     type: Date,
-    default: () => Date.now()
+    default: Date.now()
     
   }
 
 });
 
 export default mongoose.model('Habit', habitSchema);
-const demo = {
-  id: 1,
-  userId: 1,
-  title: "Drink Water",
-  category: "Health",
-  streak: 4,
-  color: "blue",
-  bestStreak: 12,
-  completedDates: ["2025-04-05", "2025-04-04","2025-04-03"],
-  createdAt: Date.now()
-}

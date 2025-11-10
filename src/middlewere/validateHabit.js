@@ -10,8 +10,6 @@ const createSchema = Joi.object({
     .required()
     .max(20)
     .trim(),
-  
-
 });
 
 const validateId = Joi.object({
@@ -20,6 +18,19 @@ const validateId = Joi.object({
     .hex() 
 
 });
+
+const updateSchema = Joi.object({
+  title: Joi.string()
+    .optional()
+    .max(20)
+    .trim(),
+
+  category: Joi.string()
+    .optional()
+    .max(20)
+    .trim(),
+
+}).min(1);
 
 
 
@@ -67,4 +78,24 @@ function idValidation(req, res, next) {
   next();
 }
 
-export {createValidation, idValidation};
+function updateValidation(req, res, next) {
+  const {error, value } = updateSchema.validate(req.body, {
+    abortEarly: false,
+    stripUnknown: true
+  });
+  
+  if (error) {
+    return res.status(400).json({
+      success: false,
+      message: 'Validation failed',
+      errors: error.details.map(d => d.message)
+    });
+  }
+
+  // replace the original data with cleaned version
+  req.body = value;
+  next();
+  
+}
+
+export {createValidation, idValidation, updateValidation};

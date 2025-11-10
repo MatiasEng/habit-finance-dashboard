@@ -4,16 +4,16 @@ const expenseSchema = mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    require: true
+    required: true
   },
   amount: {
     type: Number,
-    require: true,
+    required: true,
     min: 0
   },
   category: {
     type: String,
-    require: true,
+    required: true,
 
     
   },
@@ -24,12 +24,12 @@ const expenseSchema = mongoose.Schema({
   },
   date: {
     type: Date,
-    default: () => Date.now(),
+    default: Date.now(),
 
   }, 
   createdAt: {
     type: Date,
-    default: () => Date.now(),
+    default: Date.now(),
   }
 
 });

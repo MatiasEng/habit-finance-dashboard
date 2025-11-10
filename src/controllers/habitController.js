@@ -36,7 +36,6 @@ async function createHabit(req, res) {
       category: category,
     });
     
-    console.log(newHabit.id);
     res.status(201).json({
       success: true,
       habitCreated: await Habit.find({_id: newHabit.id}).populate('user', 'username email')
@@ -59,19 +58,8 @@ async function getOneHabit(req, res) {
     // varify through validation
     const habitId = req.params.id;
 
-    const userId = req.user.id;
-    const userHabits = await Habit.find({user: userId});
-
-    if (userHabits.length === 0) {
-      return res.status(404).json({
-        success: false,
-        error: "Not Habits find for the User"
-      });
-    }
-    
     // Cleaner Version to display
-    const habit = await Habit.find({_id: habitId}, {_id: 0, __v: 0}).populate('user', 'username email -_id');
-    console.log(habit);
+    const habit = await Habit.find({_id: habitId, user: user.id}, {_id: 0, __v: 0}).populate('user', 'username email -_id');
 
     if (!habit) return res.status(404).json({error: "Habit not found"});
     
@@ -83,69 +71,99 @@ async function getOneHabit(req, res) {
         message: "Get habit failed",
         error: err.name === "CastError" ? "Cannot find Habit" : err.message
       });
-   
   }
-
 }
 
-function updateOneHabit(req, res) {
-  const { title, category, color } = req.body;
-  const habitId = req.params.id;
-  
-  if (!title && !category && !color) return res.status(400).json({error: "At lest 1 field require"});
-  if (isNaN(habitId)) return res.status(400).json({error: "The ID must be a number"});
-  
-  const userId = req.user.id;
-  let userHabits = habits.filter(h => h.userId === userId);
-
-  let habit = userHabits[habitId-1];
-  if (!habit) return res.status(404).json({error: "Habit Not Found"});
-  
-
-  // variable ?? fallback
-  // only uses the fallback if the variable is null or undefined
-  habit.title = title ?? habit.title;
-  habit.category = category ?? habit.category;
-  habit.color = color ?? habit.color;
-
-  res.json(habit);
+async function updateOneHabit(req, res) {
+  try {
+    const { title, category} = req.body;
+    const habitId = req.params.id;
+    const user = req.user;
+    
+    const updatedHabit = await Habit.findOneAndUpdate({_id: habitId, user: user.id}, req.body, {new: true})
+    if(!updateOneHabit) {
+      return res.status(404).json({
+        success: false,
+        message: "Habit not found on user Habits"
+      })
+    }
+    
+    res.json({
+      success: true,
+      updatedHabit: await Habit.findById(habitId).populate('user', 'username email -_id')
+    });
+      
+  } catch (err) {
+    res.status(400).json({
+        sucess: false,
+        message: "Update habit failed",
+        error: err.message
+      });
+  }
 }
 
-function deleteOneHabit(req, res) {
-  const habitId = req.params.id;
-  
-  if (isNaN(habitId)) return res.status(400).json({error: "The ID must be a number"});
+async function deleteOneHabit(req, res) {
+  try {
+    const habitId = req.params.id;
+    const user = req.user;
+    
+    
+    const habitToDelete = await Habit.find({_id: habitId, user: user.id}).populate('user', 'username email -_id');
 
-  // get the user habits
-  const userId = req.user.id;
-  let userHabits = habits.filter(h => h.userId === userId);
+    if(!habitToDelete) {
+      return res.status(404).json({
+        success: false,
+        message: "Habit not found on user Habits"
+      })
+    }
+    await Habit.findOneAndDelete({_id: habitId, user: user.id});
+    
+    
+    res.json({
+      success: true,
+      deletedHabit: habitToDelete 
+    });
 
-  // check if the userId index can access a habit 
-  let habit = userHabits[habitId-1];
-  if (!habit) return res.status(404).json({error: "Habit Not Found"});
-  
-  const habitIndex = habits.findIndex(h => h.id === habit.id);
-  
-  habits.splice(habitIndex, 1);
-  res.json({message: "Habit Deleted", habit: habit})
+  } catch(err) {
+    res.status(400).json({
+      success: false,
+      message: "Delete habit failed",
+      error: err.message
+    })
+
+  }
 }
 
 
-function markAsDone(req, res) {
-  
-  const habitId = req.params.id;
-  if (isNaN(habitId)) return res.status(400).json({error: "The ID must be a number"});
+async function markAsDone(req, res) {
+  try {
+    const habitId = req.params.id;
+    const user = req.user;
+    
+    const updatedHabit = await Habit.findOneAndUpdate(
+      {_id: habitId, user: user.id}, 
+      {$push: {completedDates: Date.now()}}
+    ).populate('user', 'username email -_id');
+    
+    if (!updatedHabit) {
+      return res.status(404).json({
+        success: false,
+        message: "Mark habit as done failed"
+      });
+    }
 
-  const userId = req.user.id;
-  const userHabits = habits.filter(h => h.userId === userId);
+    res.json({
+      success: true,
+      updatedHabit: updatedHabit
+    });
 
-  let habit = userHabits[habitId-1];
-  if (!habit) return res.status(404).json({error: "Habit Not Found"});
-
-  habit.completedDates.push(getCurrentDate());
-  
-  res.json({habit});
-  
+  } catch(err) {
+    res.status(400).json({
+      success: false,
+      message: "Mark as completed failed",
+      error: err.message
+    })
+  }
 }
 
 function getCurrentDate() {
