@@ -1,62 +1,90 @@
-import habits from '../data/habits.js';
-let nextId = habits.length+1;
+import Habit from '../models/Habit.js';
 
-function getHabits(req, res) {
+async function getHabits(req, res) {
   // User passed from the requireAuth Middlewere
-  const user = req.user;
-  
-  if (!user) return res.status(400).json({error: "User logged in is require"});
+  try {
+    const user = req.user;
+    
+    if (!user) return res.status(400).json({error: "User logged in is require"});
 
-  const userId = user.id;
-  let userHabits = habits.filter(h => h.userId === userId);
-  
-  if (!userHabits) return res.status(404).json({error: "No Habits Found for the User"});
-  
-  res.json(userHabits);
+
+    const userHabits = await Habit.find({user: user.id});
+    
+    if (userHabits.length === 0) return res.status(404).json({error: "No Habits Found for the User"});
+    
+    res.json(userHabits);
+
+  } catch (err) {
+    res.status(400).json({
+      sucess: false,
+      message: "Get habits failed",
+      error: err.message
+    });
+    
+  }
 }
 
-function createHabit(req, res) {
-  const userId = req.user.id;
-  const { title, category, color } = req.body;
-  
-  if (!userId) return res.status(400).json({error: "User logged in is require"});
-  
-  if (!title || !category || !color) return res.status(400).json({error: "All Fields Require"});
-  
-  
-  const newHabit = {
-    id: nextId,
-    userId: userId,
-    title: title,
-    category: category,
-    streak: 0,
-    bestStreak: 0,
-    color: color,
-    completedDates: [],
-    createdAt: getCurrentDate()
+async function createHabit(req, res) {
+  try {
+    const userId = req.user.id;
+
+    const { title, category} = req.body;
+    
+    const newHabit = await Habit.create({
+      user: userId,
+      title: title,
+      category: category,
+    });
+    
+    console.log(newHabit.id);
+    res.status(201).json({
+      success: true,
+      habitCreated: await Habit.find({_id: newHabit.id}).populate('user', 'username email')
+    });
+
+
+  } catch (err) {
+    res.status(400).json({
+      sucess: false,
+      message: "Habit creation failed",
+      error: err.message
+    });
+    
   }
-  
-  nextId++;
-  habits.push(newHabit);
-  res.status(201).json(newHabit);
   
 }
 
-function getOneHabit(req, res) {
-  const habitId = req.params.id;
+async function getOneHabit(req, res) {
+  try {
+    // varify through validation
+    const habitId = req.params.id;
 
-  const userId = req.user.id;
-  let userHabits = habits.filter(h => h.userId === userId);
+    const userId = req.user.id;
+    const userHabits = await Habit.find({user: userId});
 
+    if (userHabits.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: "Not Habits find for the User"
+      });
+    }
+    
+    // Cleaner Version to display
+    const habit = await Habit.find({_id: habitId}, {_id: 0, __v: 0}).populate('user', 'username email -_id');
+    console.log(habit);
 
-  if (!userId || !habitId) return res.status(400).json({error: "All fields require"});
-  if (userHabits.length === 0 || habitId > userHabits.length || habitId <= 0) { 
-    return res.status(404).json({error: "Habit Not Found"})
+    if (!habit) return res.status(404).json({error: "Habit not found"});
+    
+    res.json(habit);
+
+  } catch (err) {
+    res.status(400).json({
+        sucess: false,
+        message: "Get habit failed",
+        error: err.name === "CastError" ? "Cannot find Habit" : err.message
+      });
+   
   }
-  if (isNaN(habitId)) return res.status(400).json({error: "The habit ID must be a number"});
-  
-  const habit = userHabits[habitId-1];
-  res.json(habit);
 
 }
 

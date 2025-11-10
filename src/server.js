@@ -1,3 +1,4 @@
+// Generate keys
 // require('crypto').randomBytes(64).toString('hex')
 import express from 'express';
 import dotenv from 'dotenv';
@@ -13,7 +14,7 @@ import expensesRoutes from '../src/routes/expenseRoutes.js'
 import dashboardRoutes from '../src/routes/dashboardRoutes.js'
 import authRoutes from '../src/routes/authRoutes.js';
 
-import testRoutes from '../src/routes/testDB.js';
+import testRoutes from '../src/routes/testDB.js'; // INCLUDED IN .env
 
 
 const app = express();

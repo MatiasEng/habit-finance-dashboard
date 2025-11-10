@@ -1,7 +1,7 @@
 // TODO implement all the functions
 // users.push({id: 1, username: "john_doe", email:"john.doe@gmail.com", password: "password1", createdAt: "2025-01-15", isAdmin: true});
 
-import users from '../data/users.js';
+import User from '../models/User.js';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 import refreshTokens from '../data/refreshTokens.js'
@@ -9,78 +9,89 @@ import refreshTokens from '../data/refreshTokens.js'
 const ACCESS_TOKEN = process.env.ACCESS_TOKEN;
 const REFRESH_TOKEN = process.env.REFRESH_TOKEN;
 
-let nextId = users.length+1;
+async function registerUser(req, res) {
+  try {
+    const { username, email, password } = req.body; 
+    
+    // Create a new user
+    const newUser = await User.create({
+      username: username,
+      email: email,
+      password: password
+    });
+    
+    res.status(201).json({
+      success: true,
+      userCreated: {
+        username: username,
+        email: email
+      }
+    });
 
-function registerUser(req, res) {
-  const { username, email, password } = req.body; 
-  
-  if (!username || !email || !password) return res.status(400).json({error: "All Fields are Require"});
-  
-  if (users.find(u => u.email === email.toLowerCase())) return res.status(409).json({error: "Email is already registered"});
-  
-  
-  const newUser = {
-    id: nextId,
-    username: username,
-    email: email,
-    password: password,
-    createdAt: getCurrentDate(),
-    isAdmin: false
+  } catch(err) {
+    res.status(400).json({
+      success: false,
+      message: 'User register failed',
+      error: err.message.split(':')[0]
+    });
+
   }
   
-  users.push(newUser);
-  res.status(201).json(newUser);
 }
 
-function loginUser(req, res) {
-  let { email, password } = req.body;
-  
-  if (!email || !password) return res.status(400).json({error: "All fields are required"});
-  
-  const user = users.find(u => u.email === email.toLowerCase() && u.password === password);
-  
-  if(!user) return res.status(404).json({error: `User with email ${email} Not Found`});
-  
+async function loginUser(req, res) {
+  console.log('in login');
+  try {
+    let { email, password } = req.body;
+    
+    if (!email || !password) return res.status(400).json({error: "All fields are required"});
+    
 
-  // JWT
-  let userId = user.id;
-  let userEmail = user.email;
-  
-  const accessToken = jwt.sign({userId, userEmail}, ACCESS_TOKEN, {expiresIn: '1h'});
-  const refreshToken = jwt.sign({userId, userEmail}, REFRESH_TOKEN, {expiresIn: '1d'});
-  
-  refreshTokens.push(refreshToken);
+    // JWT
+    const user = await User.findOne({email: email, password: password});
+    
+    if (!user) return res.status(404).json({
+      success: false,
+      err: "Cannot find a user with email & password privide",
+    });
 
-  res.json({accessToken: accessToken, refreshToken: refreshToken});
+    const accessToken = jwt.sign({userId: user.id}, ACCESS_TOKEN, {expiresIn: '1h'});
+    const refreshToken = jwt.sign({userId: user.id}, REFRESH_TOKEN, {expiresIn: '1d'});
+    
+    refreshTokens.push(refreshToken);
+
+    res.json({accessToken: accessToken, refreshToken: refreshToken});
+
+  } catch (err) {
+    res.status(400).json({
+      sucess: false,
+      message: "Login failed",
+      error: err.message
+    });
+  }
   
 }
 
 function refreshAccessToken(req, res) {
   const { refreshToken } = req.body;
   
-  // refreshTokens is empty
-  
-  if (!refreshToken) return res.status(401).json({error: "No refresh Token"});
-  
-  console.log(refreshTokens);
-  
   if (!refreshTokens.includes(refreshToken)) {
     return res.status(401).json({error: "Invalid refresh Token"});
   }
   
   try {
-
     const payload = jwt.verify(refreshToken, REFRESH_TOKEN);
-    const {userId, userEmail} = payload;
+    const userId = payload.userId;
     
-    const newToken = jwt.sign({userId, userEmail}, ACCESS_TOKEN, {expiresIn: '30s'});
+    const newToken = jwt.sign({userId: userId}, ACCESS_TOKEN, {expiresIn: '30s'});
     
     res.json({accessToken: newToken});
     
   } catch (err) {
-    // remove all the other refresh tokens
-    console.error(err);
-    res.status(401).json({error: "Invalid refresh Token"});
+    res.status(401).json({
+      sucess: false,
+      error: "Invalid refresh Token"
+    });
   }
 
 }
@@ -96,8 +107,10 @@ function logoutUser(req, res) {
      return res.json({message: "Logged out"});
   }
   
-  res.status(404).json({error: "Token not found"});
-
+  res.status(404).json({
+    sucess: false,
+    error: "Token not found"
+  });
 
 }
 
