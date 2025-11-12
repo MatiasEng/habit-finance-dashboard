@@ -1,8 +1,8 @@
 import Expense from '../models/Expense.js';
 
 async function getExpenses(req, res) {
-  try {
 
+  try {
     const user = req.user;
     const userExpenses = await Expense.find({user: user.id}).populate('user', 'username email -_id');
 
@@ -78,7 +78,7 @@ async function updateOneExpense(req, res) {
     const user = req.user;
     const expenseId = req.params.id;
     
-    const updatedExpense = await Expense.findOneAndUpdate({_id: expenseId, user: user.id}, req.body)
+    const updatedExpense = await Expense.findOneAndUpdate({_id: expenseId, user: user.id}, req.body, {new: true})
       .populate('user', 'username email -_id');
 
     if (!updatedExpense) {

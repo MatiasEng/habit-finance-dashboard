@@ -40,7 +40,6 @@ async function registerUser(req, res) {
 }
 
 async function loginUser(req, res) {
-  console.log('in login');
   try {
     let { email, password } = req.body;
     
@@ -52,10 +51,10 @@ async function loginUser(req, res) {
     
     if (!user) return res.status(404).json({
       success: false,
-      err: "Cannot find a user with email & password privide",
+      err: "Cannot find a user with email & password provide",
     });
 
-    const accessToken = jwt.sign({userId: user.id}, ACCESS_TOKEN, {expiresIn: '1h'});
+    const accessToken = jwt.sign({userId: user.id}, ACCESS_TOKEN, {expiresIn: '5h'}); // return to original expiration time
     const refreshToken = jwt.sign({userId: user.id}, REFRESH_TOKEN, {expiresIn: '1d'});
     
     refreshTokens.push(refreshToken);
