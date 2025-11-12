@@ -1,6 +1,6 @@
-import users from '../data/users.js';
-import habits from '../data/habits.js';
-import expenses from '../data/expenses.js';
+import User from '../models/User.js';
+import Habit from '../models/Habit.js';
+import Expense from '../models/Expense.js';
 // Return the entire dashboard
 /*
 User info: username, email, admin
@@ -8,10 +8,34 @@ Habits info: title, category, streak, best streak, completed dates
 Expense info: category, description, amount, date => total spend
 
 */
-function getEntireDashboard(req, res) {
-  const user = req.user;
-  const userHabits = habits.filter(h => h.userId === user.id);
-  const userExpenses = expenses.filter(e => e.userId === user.id);
+async function getEntireDashboard(req, res) {
+  try {
+    const user = req.user;
+    // use the filters to hide data
+    const userHabits = await Habit.find({user: user.id});
+    const userExpenses = await Expense.find({user: user.id});
+    
+    const total = userExpenses.reduce((sum, e) => sum + e.amount, 0);
+    
+    res.json({
+      User: {
+        username: user.username,
+        email: user.email,
+        isAdmin: user.idAdmin
+      },
+      Habits: userHabits,
+      Expenses: userExpenses,
+      TotalSpend: total
+    })
+
+  } catch(err) {
+    res.status(400).json({
+      success: false,
+      message: "Failed to get the dashboard",
+      error: err.message
+    });
+  }
+
   
   const habitsInfo = userHabits.map(h => ({
     title: h.title,

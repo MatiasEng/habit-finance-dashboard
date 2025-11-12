@@ -1,14 +1,10 @@
 # Dependencies
-node_modules/
+backend/node_modules/
 
 
 # Enviroment Variables
-.env
+backend/.env
 
 # Logs
 
 # Runtime Data
-
-# Test
-src/routes/testDB.js
-src/controllers/testController.js

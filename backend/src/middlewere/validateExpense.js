@@ -42,7 +42,6 @@ const idSchema = Joi.object({
 });
 
 function createValidation(req, res, next) {
-  
   const { error, value } = createSchema.validate(req.body , {
     abortEarly: false,
     stripUnknown: true

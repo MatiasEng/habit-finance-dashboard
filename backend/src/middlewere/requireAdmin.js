@@ -1,5 +1,3 @@
-import users from '../data/users.js';
-
 // Used after requireAuth middlewere
 function requireAdmin(req, res, next) {
 
@@ -13,5 +11,4 @@ function requireAdmin(req, res, next) {
   next();
 
 }
-
 export { requireAdmin };
