@@ -1,9 +1,9 @@
 # Dependencies
-backend/node_modules/
+node_modules/
 
 
 # Enviroment Variables
-backend/.env
+.env
 
 # Logs
 
