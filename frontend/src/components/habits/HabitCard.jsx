@@ -2,29 +2,41 @@ import api from '../../lib/api';
 import {useState} from 'react';
 
 function HabitCard({ habit, onHabitUpdate }) {
-  const [isLoading, setIsLoading] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [localCompleted, setLocalCompleted] = useState(false);
   
   const isCompletedToday = () => {
     if (!habit.completedDates || habit.completedDates.length === 0) return false;
 
-    const today = new Date().toDateString();
+    const today = new Date();
+    const todayUTC = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()));
     
     return habit.completedDates.some(dateString => {
       const completionDate = new Date(dateString);
-      return completionDate.toDateString() === today;
+      const completionDayUTC = new Date(Date.UTC(
+        completionDate.getUTCFullYear(), 
+        completionDate.getUTCMonth(), 
+        completionDate.getUTCDate()
+      ));
+      
+      return completionDayUTC.getTime() === todayUTC.getTime();
     });
   };
   
-  const [completed, setCompleted] = useState(isCompletedToday());
+  //const [completed, setCompleted] = useState(isCompletedToday());
+  const completed = localCompleted || isCompletedToday();
 
   const handleComplete = async () => {
-    isLoading(true);
+    setIsLoading(true);
+    setLocalCompleted(true);
     try {
       const response = await api.post(`/habits/${habit._id}/complete`);
       
-      setCompleted(true)
+      //setCompleted(true)
 
-      const updatedHabit = response.data;
+      const updatedHabit = await response.data.updatedHabit;
+      
+      console.log(response);
       
       // Notify the parent about the update
       if (onHabitUpdate) {
@@ -33,6 +45,7 @@ function HabitCard({ habit, onHabitUpdate }) {
 
     } catch(err) {
       console.error('Failed to compete habit', err.message)
+      setLocalCompleted(false);
     } finally {
       setIsLoading(false);
     }
@@ -76,9 +89,9 @@ function HabitCard({ habit, onHabitUpdate }) {
 
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow border-1-4 border-blue-500 mb-3">
+    <div className="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500 mb-3"> {/* Fixed: border-l-4 */}
       <div className="flex justify-between items-start">
-        <div classnName="flex-1">
+        <div className="flex-1"> {/* Fixed: className */}
           <h3 className={`font-semibold text-lg ${completed ? 'text-gray-500 line-through' : 'text-gray-800'}`}>
             {habit.title}
           </h3>
@@ -96,36 +109,40 @@ function HabitCard({ habit, onHabitUpdate }) {
             </span>
           </div>
         </div>
-      </div>
-      {/*Complete / redo(to implement) button*/}
-      <div className='ml-4 flex space-x-2'>
-        {!completed ? (
-          <button
-            onClick={handleComplete}
-            disabled={isLoading}
-            className='bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
-          >
-            {isLoading ? (
-              <div className="flex items-center">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+        
+        {/* Complete button - moved inside the flex container */}
+        <div className='ml-4 flex space-x-2'>
+          {!completed ? (
+            <button
+              onClick={handleComplete}
+              disabled={isLoading}
+              className='bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+            >
+              {isLoading ? (
+                <div className="flex items-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                   ...
-              </div>
-            ) : (
-              'Complete'
-            )} 
-          </button>
-        ): (
-          <div className="flex space-x-2">
+                </div>
+              ) : (
+                'Complete'
+              )} 
+            </button>
+          ) : (
+            <div className="flex space-x-2">
               <button
                 disabled
                 className="bg-green-500 text-white px-4 py-2 rounded-lg font-medium opacity-75"
               >
                 Completed ✓
               </button>
-          </div>
-        )}
+              {/* Redo button placeholder for when you implement it */}
+              {/* <button className="bg-gray-500 text-white px-3 py-2 rounded-lg text-sm">
+                Redo
+              </button> */}
+            </div>
+          )}
+        </div>
       </div>
-
     </div>
   );
 }

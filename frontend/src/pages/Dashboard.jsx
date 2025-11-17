@@ -2,83 +2,49 @@ import {useState, useEffect} from 'react';
 import api from '../lib/api';
 import { useNavigate } from 'react-router-dom';
 
-import HabitCard from '../components/habits/HabitCard';
+//import HabitCard from '../components/habits/HabitCard';
+import HabitsList from '../components/habits/HabitsList';
 
 function Dashboard() {
   
-  const [habits, setHabits] = useState([]);
-  const [expenses, setExpenses] = useState([]);
-  const [loading, setLoading] = useState(true);
+  //const [expenses, setExpenses] = useState([]);
+  //const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
-  
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [habitsRes, expensesRes] = await Promise.all([
-          api.get('/habits'),
-          api.get('/expenses')
-        ]);
-        
-        setHabits(habitsRes.data);
-        setExpenses(expensesRes.data);
-
-      } catch(err) {
-        if (err.response?.status === 401) {
-          localStorage.removeItem('token');
-          navigate('/login');
-        }
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData()
-  }, [navigate]);
   
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/login');
   }
-  
-  if (loading) return (
-    <p>
-      Loading...
-    </p>
-  )
-  
-
-  const handleHabitUpdate = (updateHabit) => {
-    setHabits(prevHabits => 
-      prevHabits.map(h => 
-        h._id === updateHabit._id ? updateHabit : h
-      )
-    );
+  const createHabit = () => {
+    navigate('/habitform')
   }
-
+  
   
   return(
     <div className="p-8">
 
-      <h1 className="text-2xl font-bold">Dashboard</h1>
+      <h1 className="text-2xl font-bold my-3">Dashboard</h1>
 
       {/* Habits*/}
-      <section>
-        <h2>My Habits</h2>
-        {habits.map(h => (
-          <HabitCard key={h._id} habit={h} onHabitUpdate={handleHabitUpdate}></HabitCard>
-        ))}
+      <section flex>
+        <div className="flex items-center justify-between">
+          <h1 className='font-bold text-xl mb-5'>My Habits</h1>
+          <button onClick={createHabit} 
+          className="text-center text-start mb-5 mr-5 border shadow font-semibold px-5 py-2 border-2 border-green-500 rounded-full hover:bg-green-200 transition-colors
+          ">+ Create Habit</button>
+        </div>
+        <HabitsList/>
       </section>
 
       {/* Expenses*/}
       <section>
-        <h2>My Expenses</h2>
-        {expenses.map(e => (
-          <div key={e._id}>
-            <span>{`${e.category} - ${e.amount}`}</span>
-          </div>
-        ))}
       </section>
-      <button onClick={handleLogout}>Log Out</button>
+      <button 
+        className="bg-blue-500 text-white font-bold px-4 py-2 rounded hover:bg-blue-600 hover:scale-103 transition-colors transition-scale"
+        onClick={handleLogout}
+        >Log Out
+        </button>
     </div>
   );
 }
