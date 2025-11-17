@@ -12,7 +12,6 @@ function Login() {
       const res = await api.post('/auth/login', {email, password});
 
       localStorage.setItem('token', res.data.accessToken);
-      console.log('passed login');
       navigate('/');
     } catch(err) {
       console.log(err)

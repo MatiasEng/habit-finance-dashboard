@@ -2,6 +2,8 @@ import {useState, useEffect} from 'react';
 import api from '../lib/api';
 import { useNavigate } from 'react-router-dom';
 
+import HabitCard from '../components/habits/HabitCard';
+
 function Dashboard() {
   
   const [habits, setHabits] = useState([]);
@@ -43,6 +45,15 @@ function Dashboard() {
       Loading...
     </p>
   )
+  
+
+  const handleHabitUpdate = (updateHabit) => {
+    setHabits(prevHabits => 
+      prevHabits.map(h => 
+        h._id === updateHabit._id ? updateHabit : h
+      )
+    );
+  }
 
   
   return(
@@ -54,11 +65,10 @@ function Dashboard() {
       <section>
         <h2>My Habits</h2>
         {habits.map(h => (
-          <div key={h._id}>
-            {h.title}
-          </div>
+          <HabitCard key={h._id} habit={h} onHabitUpdate={handleHabitUpdate}></HabitCard>
         ))}
       </section>
+
       {/* Expenses*/}
       <section>
         <h2>My Expenses</h2>
@@ -68,7 +78,7 @@ function Dashboard() {
           </div>
         ))}
       </section>
-      <button onClick={handleLogout()}>Log Out</button>
+      <button onClick={handleLogout}>Log Out</button>
     </div>
   );
 }
