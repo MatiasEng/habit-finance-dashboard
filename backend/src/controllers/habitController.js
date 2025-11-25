@@ -142,7 +142,8 @@ async function markAsDone(req, res) {
     
     const updatedHabit = await Habit.findOneAndUpdate(
       {_id: habitId, user: user.id}, 
-      {$push: {completedDates: Date.now()}}
+      {$push: {completedDates: Date.now()}}, 
+      {new: true}
     ).populate('user', 'username email -_id');
     
     if (!updatedHabit) {
