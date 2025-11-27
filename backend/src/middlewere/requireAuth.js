@@ -1,11 +1,14 @@
 import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
 
-const ACCESS_TOKEN = process.env.ACCESS_TOKEN;
+
+function getAccessToken() {
+  return process.env.ACCESS_TOKEN; 
+}
 
 async function requireAuth(req, res, next) {
   // Get the JWT
+  const ACCESS_TOKEN = getAccessToken();
   const authHeader = req.headers.authorization;
   
   if (!authHeader || !authHeader.startsWith('Bearer ')) return res.status(401).json({error: "Token require"});

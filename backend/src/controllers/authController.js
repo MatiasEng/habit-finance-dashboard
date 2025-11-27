@@ -5,6 +5,7 @@ import User from '../models/User.js';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 import refreshTokens from '../data/refreshTokens.js'
+dotenv.config();
 
 const ACCESS_TOKEN = process.env.ACCESS_TOKEN;
 const REFRESH_TOKEN = process.env.REFRESH_TOKEN;
@@ -67,6 +68,7 @@ async function loginUser(req, res) {
       message: "Login failed",
       error: err.message
     });
+
   }
   
 }

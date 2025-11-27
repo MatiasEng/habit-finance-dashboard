@@ -12,7 +12,7 @@ async function connectDB() {
     //console.log('Port:', mongoose.connection.port);
 
   } catch (e) {
-    console.error('MongoDB Connection error', err.message);
+    console.error('MongoDB Connection error', e.message);
     process.exit(1);
   }
 }
