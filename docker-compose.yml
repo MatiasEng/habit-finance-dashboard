@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "5050:5050"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: development
+    # Remove env_file and let the volume-mounted .env work naturally
+    depends_on:
+      - mongodb
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      NODE_ENV: development
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - app-network
+    restart: unless-stopped
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+
+# Command to use mongosh    
+# docker-compose exec mongodb mongosh -u admin -p password --authenticationDatabase admin

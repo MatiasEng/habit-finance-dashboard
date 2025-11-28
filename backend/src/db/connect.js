@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 
 async function connectDB() {
   try {
+    console.log(process.env.PORT)
     await mongoose.connect(process.env.MONGODB_URI);
     console.log('MongoDB Connected');
     //console.log('Database name:', mongoose.connection.db.databaseName);

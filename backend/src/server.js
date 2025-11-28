@@ -1,30 +1,21 @@
 import dotenv from 'dotenv';
-console.log('1');
 dotenv.config();
+
 // Generate keys
 // require('crypto').randomBytes(64).toString('hex')
 import express from 'express';
-console.log('2');
 import connectDB from './db/connect.js';
-console.log('3');
 import cors from 'cors';
-console.log('4');
 
 // Middlewere
 import logger from './middlewere/logger.js';
-console.log('5');
 
 // Routes
 import usersRoutes from './routes/userRoutes.js'
-console.log('5');
 import habitsRoutes from './routes/habitRoutes.js'
-console.log('6');
 import expensesRoutes from './routes/expenseRoutes.js'
-console.log('7');
 import dashboardRoutes from './routes/dashboardRoutes.js'
-console.log('8');
 import authRoutes from './routes/authRoutes.js';
-console.log('9');
 
 
 const app = express();

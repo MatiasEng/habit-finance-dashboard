@@ -18,11 +18,11 @@ function Dashboard() {
     navigate('/login');
   }
   const createHabit = () => {
-    navigate('/habitform')
+    navigate('dashboard/habitform')
   }
   
   const createExpense= () => {
-    navigate('/expenseform')
+    navigate('dashboard/expenseform')
   }
   
   return(

@@ -17,13 +17,13 @@ function App() {
         </AuthGuard>
       }/>
 
-      <Route path='/habitform' element={
+      <Route path='dashboard/habitform' element={
         <AuthGuard>
           <HabitForm/>
         </AuthGuard>
       }/>
 
-      <Route path='/expenseform' element={
+      <Route path='dashboard/expenseform' element={
         <AuthGuard>
           <ExpenseForm/>
         </AuthGuard>
