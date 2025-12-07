@@ -1,46 +1,46 @@
 import HabitCard from './HabitCard';
-import {useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 import api from '../../lib/api';
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 function HabitsList() {
-  
+
   const [habits, setHabits] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
-  
-  useEffect( () => {
-    
+
+  useEffect(() => {
+
     const fetchData = async () => {
       setIsLoading(true);
       try {
         const habitsRes = await api.get('/habits');
-        
+
         setHabits(habitsRes.data);
 
-      } catch(err) {
+      } catch (err) {
         if (err.response?.status === 401) {
           localStorage.removeItem('token');
           navigate('/login');
-        }; 
-      }finally {
+        };
+      } finally {
         setIsLoading(false);
       }
-      
+
     }
-    
+
     fetchData();
-    
-  }, [navigate]);       
-  
+
+  }, [navigate]);
+
   const handleHabitUpdate = (updatedHabit) => {
-    setHabits(prevHabits => 
-      prevHabits.map(h => 
+    setHabits(prevHabits =>
+      prevHabits.map(h =>
         h._id === updatedHabit._id ? updatedHabit : h
       )
     );
   };
-  
+
   // Loading state
   if (isLoading) {
     return (
@@ -50,7 +50,7 @@ function HabitsList() {
       </div>
     );
   }
-  
+
 
   if (habits.length === 0) {
     return (
@@ -63,7 +63,7 @@ function HabitsList() {
       </div>
     );
   }
-  
+
   return (
     <div>
       {habits.map(habit => (
