@@ -22,8 +22,8 @@ function Login() {
       console.log(res)
       navigate('/');
     } catch (err) {
-      console.log(err)
-      alert('Login Failed');
+      console.log(err.response)
+      alert(err.response.data.err)
     }
   };
 

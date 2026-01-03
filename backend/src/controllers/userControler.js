@@ -6,19 +6,19 @@ import Expense from '../models/Expense.js';
 async function getMyProfile(req, res) {
   try {
     const user = req.user;
-    
-    const profile = await User.find({_id: user.id}, {_id: 0, password: 0, __v: 0});
-    
+
+    const profile = await User.find({ _id: user.id }, { __v: 0 });
+
     if (!profile) {
       res.status(404).json({
         success: false,
         message: "Profile not found"
       });
     }
-    
+
     res.json(profile);
 
-  } catch(err) {
+  } catch (err) {
     res.status(400).json({
       success: false,
       message: "Get profile failed",
@@ -30,8 +30,8 @@ async function getMyProfile(req, res) {
 
 async function updateProfile(req, res) {
   try {
-    const user  = req.user;
-    const updatedProfile = await User.findOneAndUpdate({_id: user.id}, req.body, {new: true});
+    const user = req.user;
+    const updatedProfile = await User.findOneAndUpdate({ _id: user.id }, req.body, { new: true });
 
     // check because i think this will never be reached
     if (!updatedProfile) {
@@ -40,13 +40,13 @@ async function updateProfile(req, res) {
         message: "Profile not found"
       });
     }
-    
+
     res.json({
       success: true,
-      updatedprofile: await User.findOne({_id: user.id}, {_id: 0, __v: 0, password: 0})
+      updatedprofile: await User.findOne({ _id: user.id }, { _id: 0, __v: 0, password: 0 })
     });
 
-  } catch(err) {
+  } catch (err) {
     res.status(400).json({
       success: false,
       message: "Update profile failed",
@@ -59,30 +59,30 @@ async function updateProfile(req, res) {
 async function deleteAccount(req, res) {
   try {
     const user = req.user;
-    
-    const deletedUser = await User.findOneAndDelete({_id: user.id});
-    
+
+    const deletedUser = await User.findOneAndDelete({ _id: user.id });
+
     if (!deletedUser) {
       res.status(404).json({
         success: false,
         message: "Profile not found"
       });
     }
-    
+
     res.json({
       success: true,
       deletedUser: deletedUser
     });
 
-  } catch(err) {
+  } catch (err) {
     res.status(400).json({
       success: false,
       message: "Delete account failed",
       error: err.message
     });
-    
+
   }
-  
+
 }
 
 async function getAllUsers(req, res) {
@@ -93,18 +93,18 @@ async function getAllUsers(req, res) {
         username: user.username,
         email: user.email
       },
-      Users: await User.find({}, {_id: 0, __v: 0, password: 0})
+      Users: await User.find({}, { _id: 0, __v: 0, password: 0 })
     });
-     
-  } catch(err) {
+
+  } catch (err) {
     res.status(400).json({
       success: false,
       message: "Delete account failed",
       error: err.message
     });
-    
+
   }
 
 }
 
-export { getMyProfile, updateProfile, deleteAccount, getAllUsers};
+export { getMyProfile, updateProfile, deleteAccount, getAllUsers };

@@ -14,6 +14,10 @@ import HabitDetails from './components/habits/HabitDetails'
 import ExpenseEdit from './components/expenses/ExpenseEdit.jsx'
 import HabitEdit from './components/habits/HabitEdit'
 
+import Profile from './pages/Profile'
+import ProfileEdit from './components/EditProfile'
+import ChangePassword from './components/ChangePassword'
+
 import './index.css';
 
 function App() {
@@ -26,6 +30,21 @@ function App() {
       <Route path='/' element={
         <AuthGuard>
           <Home />
+        </AuthGuard>
+      } />
+      <Route path='/profile' element={
+        <AuthGuard>
+          <Profile />
+        </AuthGuard>
+      } />
+      <Route path='/profile/edit' element={
+        <AuthGuard>
+          <ProfileEdit />
+        </AuthGuard>
+      } />
+      <Route path='/profile/changepassword' element={
+        <AuthGuard>
+          <ChangePassword />
         </AuthGuard>
       } />
 

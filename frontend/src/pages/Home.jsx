@@ -64,6 +64,11 @@ function Home() {
                 Welcome, <span className="font-medium">{username || 'User'}</span>
               </div>
               <button
+                onClick={() => navigate('/profile')}
+                className="w-10 h-10 rounded-full bg-blue-400 flex items-center justify-center text-white font-bold text-lg">
+                {username.charAt(0).toUpperCase()}
+              </button>
+              <button
                 onClick={handleLogout}
                 className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
               >

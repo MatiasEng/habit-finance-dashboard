@@ -41,7 +41,8 @@ function Register() {
 
     try {
       const response = await api.post('/auth/register', { username, email, password })
-      console.log(response.data)
+      alert('User created succesfully');
+      navigate('/login');
     } catch (err) {
       if (err.response.data.error.split(' ')[0] == 'E11000') {
         alert('Email is already register');
