@@ -33,9 +33,14 @@ function ExpenseForm() {
         date: date,
       });
 
+      // clean fields
+      setAmount('');
+      setCategory('');
+      setDescription('');
+      setDate(new Date());
+
     } catch (err) {
-      console.log(err)
-      console.log(error)
+      console.log(err.response)
     } finally {
       setIsLoading(false);
     }
