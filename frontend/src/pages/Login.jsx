@@ -23,7 +23,7 @@ function Login() {
       navigate('/');
     } catch (err) {
       console.log(err.response)
-      alert(err.response.data.err)
+      alert(err)
     }
   };
 

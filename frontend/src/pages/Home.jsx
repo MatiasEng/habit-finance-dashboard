@@ -50,35 +50,6 @@ function Home() {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100">
-      {/* Navigation Bar - Simple */}
-      <nav className="bg-white shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 py-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-2">
-              <div className="h-8 w-8 bg-blue-600 rounded-lg"></div>
-              <span className="text-xl font-semibold text-gray-800">HabitFinance</span>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <div className="hidden md:block text-gray-700">
-                Welcome, <span className="font-medium">{username || 'User'}</span>
-              </div>
-              <button
-                onClick={() => navigate('/profile')}
-                className="w-10 h-10 rounded-full bg-blue-400 flex items-center justify-center text-white font-bold text-lg">
-                {username.charAt(0).toUpperCase()}
-              </button>
-              <button
-                onClick={handleLogout}
-                className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
-
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-4 py-12">
         {/* Welcome Header */}

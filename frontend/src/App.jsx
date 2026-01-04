@@ -18,6 +18,8 @@ import Profile from './pages/Profile'
 import ProfileEdit from './components/EditProfile'
 import ChangePassword from './components/ChangePassword'
 
+import Layout from './components/layout/Layout';
+
 import './index.css';
 
 function App() {
@@ -27,16 +29,49 @@ function App() {
       <Route path='/login' element={<Login />} />
       <Route path='/register' element={<Register />} />
 
-      <Route path='/' element={
-        <AuthGuard>
-          <Home />
-        </AuthGuard>
-      } />
-      <Route path='/profile' element={
-        <AuthGuard>
-          <Profile />
-        </AuthGuard>
-      } />
+      <Route element={<Layout />}>
+        <Route path='/' element={
+          <AuthGuard>
+            <Home />
+          </AuthGuard>
+        } />
+
+        <Route path='/profile' element={
+          <AuthGuard>
+            <Profile />
+          </AuthGuard>
+        } />
+
+        {/* Habits Routes */}
+        <Route path='/habits' element={
+          <AuthGuard>
+            <HabitDashboard />
+          </AuthGuard>
+        } />
+
+        <Route path='/habits/habitform' element={
+          <AuthGuard>
+            <HabitForm />
+          </AuthGuard>
+        } />
+
+        {/* Expenses Routes */}
+        <Route path='/expenses' element={
+          <AuthGuard>
+            <ExpenseDashboard />
+          </AuthGuard>
+        } />
+
+        <Route path='/expenses/expenseform' element={
+          <AuthGuard>
+            <ExpenseForm />
+          </AuthGuard>
+        } />
+
+      </Route>
+
+
+
       <Route path='/profile/edit' element={
         <AuthGuard>
           <ProfileEdit />
@@ -45,19 +80,6 @@ function App() {
       <Route path='/profile/changepassword' element={
         <AuthGuard>
           <ChangePassword />
-        </AuthGuard>
-      } />
-
-      {/* Habits Routes */}
-      <Route path='/habits' element={
-        <AuthGuard>
-          <HabitDashboard />
-        </AuthGuard>
-      } />
-
-      <Route path='/habits/habitform' element={
-        <AuthGuard>
-          <HabitForm />
         </AuthGuard>
       } />
 
@@ -73,18 +95,6 @@ function App() {
         </AuthGuard>
       } />
 
-      {/* Expenses Routes */}
-      <Route path='/expenses' element={
-        <AuthGuard>
-          <ExpenseDashboard />
-        </AuthGuard>
-      } />
-
-      <Route path='/expenses/expenseform' element={
-        <AuthGuard>
-          <ExpenseForm />
-        </AuthGuard>
-      } />
 
       <Route path='/expenses/:id' element={
         <AuthGuard>

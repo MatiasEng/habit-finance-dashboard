@@ -78,7 +78,6 @@ async function getOneHabit(req, res) {
 
 async function updateOneHabit(req, res) {
   try {
-    const { title, category } = req.body;
     const habitId = req.params.id;
     const user = req.user;
 
@@ -90,6 +89,7 @@ async function updateOneHabit(req, res) {
       })
     }
 
+    console.log(req.body);
     res.json({
       success: true,
       updatedHabit: await Habit.findById(habitId).populate('user', 'username email -_id')

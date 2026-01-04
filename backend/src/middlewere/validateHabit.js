@@ -15,7 +15,7 @@ const createSchema = Joi.object({
 const validateId = Joi.object({
   id: Joi.string()
     .required()
-    .hex() 
+    .hex()
 
 });
 
@@ -30,6 +30,7 @@ const updateSchema = Joi.object({
     .max(20)
     .trim(),
 
+
 }).min(1);
 
 
@@ -39,12 +40,12 @@ const updateSchema = Joi.object({
 // --------------------------------------------------
 
 function createValidation(req, res, next) {
-  
-  const {error, value } = createSchema.validate(req.body, {
+
+  const { error, value } = createSchema.validate(req.body, {
     abortEarly: false,
     stripUnknown: true
   });
-  
+
   if (error) {
     return res.status(400).json({
       success: false,
@@ -60,7 +61,7 @@ function createValidation(req, res, next) {
 }
 
 function idValidation(req, res, next) {
-  const {error, value} = validateId.validate(req.params, {
+  const { error, value } = validateId.validate(req.params, {
     abortEarly: false,
     stripUnknown: true
   });
@@ -74,28 +75,28 @@ function idValidation(req, res, next) {
   }
 
   // replace the original data with cleaned version
-  req.body = value;
+  req.params = value;
   next();
 }
 
 function updateValidation(req, res, next) {
-  const {error, value } = updateSchema.validate(req.body, {
+  const { error, value } = updateSchema.validate(req.body, {
     abortEarly: false,
     stripUnknown: true
   });
-  
+
   if (error) {
     return res.status(400).json({
       success: false,
       message: 'Validation failed',
-      errors: error.details.map(d => d.message)
+      errors: error.details.map(d => d.message),
     });
   }
 
   // replace the original data with cleaned version
   req.body = value;
   next();
-  
+
 }
 
-export {createValidation, idValidation, updateValidation};
+export { createValidation, idValidation, updateValidation };
