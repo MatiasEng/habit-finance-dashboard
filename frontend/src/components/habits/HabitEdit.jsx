@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../../lib/api';
 import { X, Save, Calendar, Tag, FileText } from 'lucide-react';
+import { useAlert } from '../hooks/useAlert';
 
 
 function HabitEdit() {
@@ -11,6 +12,7 @@ function HabitEdit() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const { showInfo, showWarning, showError, showSuccess, AlertComponent } = useAlert();
 
   const [formData, setFormData] = useState({
     title: '',
@@ -53,7 +55,7 @@ function HabitEdit() {
     e.preventDefault();
 
     if (!formData.title || !formData.category) {
-      alert('All field are require');
+      showWarning('All fields are require')
       return;
     }
 
@@ -62,12 +64,13 @@ function HabitEdit() {
 
     try {
       const response = await api.put(`/habits/${id}`, formData);
-      alert('Habit updated succesfully')
-      handleClose();
+      showSuccess('Habit updated succesfully')
+      setTimeout(() => {
+        handleClose();
+      }, 500)
 
     } catch (err) {
-      console.log(err.response.data);
-
+      showError('Something went wrong')
     } finally {
       setSaving(false);
     }
@@ -85,6 +88,7 @@ function HabitEdit() {
   if (loading) {
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <AlertComponent />
         <div className="bg-white rounded-2xl p-8">
           <div className="flex flex-col items-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>

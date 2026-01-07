@@ -1,13 +1,18 @@
+import React from 'react';
 import { useState } from 'react'; import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import api from '../lib/api';
+import { useAlert } from '../components/hooks/useAlert';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const [isLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+
+  const { showSuccess, showError, showInfo, showWarning, AlertComponent } = useAlert();
 
   const togglePswdVisibility = () => {
     setShowPassword(!showPassword);
@@ -19,16 +24,23 @@ function Login() {
 
       localStorage.setItem('accessToken', res.data.accessToken);
       localStorage.setItem('refreshToken', res.data.refreshToken);
-      console.log(res)
-      navigate('/');
+      // alert success
+
+      showSuccess('Login Successfull')
+
+      setTimeout(() => {
+        navigate('/');
+
+      }, 500);
+
     } catch (err) {
-      console.log(err.response)
-      alert(err)
+      showError('Login Error');
     }
   };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
+      <AlertComponent />
       {/* Simple Card */}
       <div className="w-full max-w-sm">
         {/* Header */}

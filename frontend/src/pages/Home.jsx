@@ -1,11 +1,12 @@
 import { useNavigate } from 'react-router-dom'
 import api from '../lib/api';
 import { useEffect, useState } from 'react';
-
+import { useAlert } from '../components/hooks/useAlert';
 
 function Home() {
 
 
+  const { showSuccess, showError, showInfo, showWarning, AlertComponent } = useAlert();
   const [username, setUsername] = useState('');
 
   const navigate = useNavigate();
@@ -17,14 +18,13 @@ function Home() {
       try {
         const response = await api.get('/users/me');
 
-
         setUsername(response.data[0].username);
         const email = response.data[0].email;
 
-        console.log(username, email)
+
 
       } catch (err) {
-        console.log(err.message)
+        showError('Data coudn\'t be collected');
       }
     }
 
@@ -45,11 +45,16 @@ function Home() {
   const handleLogout = () => {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
-    navigate('/login');
+    showInfo('Loggin out...');
+
+    setTimeout(() => {
+      navigate('/login');
+    }, 500);
   }
 
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100">
+      <AlertComponent />
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-4 py-12">
         {/* Welcome Header */}

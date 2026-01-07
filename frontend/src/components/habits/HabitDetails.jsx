@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import api from '../../lib/api'
 import { useNavigate, useParams } from 'react-router-dom'
-import { X, Calendar, Tag, CheckCircle, Edit, Trash2, ArrowLeft, Flame, Target, Clock, Hash, TrendingUp } from 'lucide-react';
+import { X, Calendar, Tag, CheckCircle, Edit, Trash2, ArrowLeft, Flame, Clock, Hash, TrendingUp } from 'lucide-react';
+import { useAlert } from '../hooks/useAlert'
 
 function HabitDetails() {
-
   const { id } = useParams();
   const navigate = useNavigate();
   const [habit, setHabit] = useState(null);
@@ -12,31 +12,92 @@ function HabitDetails() {
   const [error, setError] = useState('');
   const [localStreak, setLocalStreak] = useState(0);
   const [isCompletedToday, setIsCompletedToday] = useState(false);
+  const { showError, showInfo, showWarning, showSuccess, AlertComponent } = useAlert();
+
+  // Helper function to calculate streak from dates
+  const calculateStreakFromDates = (completedDates) => {
+    if (!completedDates || completedDates.length === 0) return 0;
+
+    const dates = completedDates
+      .map(dateString => new Date(dateString))
+      .sort((a, b) => b - a);
+
+    let streak = 0;
+    let currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+
+    for (let i = 0; i < dates.length; i++) {
+      const completionDate = new Date(dates[i]);
+      completionDate.setHours(0, 0, 0, 0);
+
+      const expectedDate = new Date(currentDate);
+
+      if (completionDate.getTime() === expectedDate.getTime()) {
+        streak++;
+        currentDate.setDate(currentDate.getDate() - 1);
+      } else if (completionDate < expectedDate) {
+        break;
+      }
+    }
+    return streak;
+  };
+
+  // Helper to check if habit is completed today from API data
+  const isCompletedTodayFromAPI = (habitData) => {
+    if (!habitData?.completedDates || habitData.completedDates.length === 0) return false;
+
+    const todayDate = new Date().toISOString().split('T')[0];
+
+    return habitData.completedDates.some(date => {
+      const habitDate = date.split('T')[0];
+      return habitDate === todayDate;
+    });
+  };
 
   useEffect(() => {
     const fetchHabit = async () => {
       try {
         const response = await api.get(`/habits/${id}`);
-        setHabit(response.data[0]);
-        console.log(habit);
+        const habitData = response.data[0];
+        setHabit(habitData);
 
-        const savedStreak = localStorage.getItem(`habit_streak_${id}`);
-        const lastCompleted = localStorage.getItem(`habit_last_completed_${id}`);
+        // Get from localStorage (consistent with HabitCard)
+        const savedStreak = localStorage.getItem(`streak_${id}`);
+        const completedToday = localStorage.getItem(`completed_today_${id}`);
 
-        if (savedStreak) setLocalStreak(savedStreak);
-        if (lastCompleted) setIsCompletedToday(true);
+        console.log('LocalStorage values:', {
+          streak: savedStreak,
+          completed: completedToday
+        });
+
+        // Priority: localStorage > API data
+        if (savedStreak) {
+          setLocalStreak(Number(savedStreak));
+        } else {
+          // Calculate from API data
+          const calculatedStreak = calculateStreakFromDates(habitData.completedDates || []);
+          setLocalStreak(calculatedStreak);
+          localStorage.setItem(`streak_${id}`, calculatedStreak.toString());
+        }
+
+        if (completedToday !== null) {
+          setIsCompletedToday(completedToday === 'true');
+        } else {
+          const completedFromAPI = isCompletedTodayFromAPI(habitData);
+          setIsCompletedToday(completedFromAPI);
+          localStorage.setItem(`completed_today_${id}`, completedFromAPI.toString());
+        }
+
       } catch (err) {
-        console.log(err.response);
+        console.log('Error fetching habit:', err.response);
+        setError(err.response?.data?.message || 'Failed to fetch habit');
       } finally {
         setLoading(false);
-
       }
+    };
 
-    }
     if (id) fetchHabit();
-
-  }, [id, navigate])
-
+  }, [id]);
 
   const handleClose = () => {
     navigate(-1);
@@ -46,14 +107,16 @@ function HabitDetails() {
     try {
       await api.delete(`/habits/${id}`);
       // Clean up localStorage
-      localStorage.removeItem(`habit_streak_${id}`);
-      localStorage.removeItem(`habit_last_completed_${id}`);
+      localStorage.removeItem(`streak_${id}`);
+      localStorage.removeItem(`completed_today_${id}`);
+      localStorage.removeItem(`last_completed_${id}`);
 
-      alert('Habit deleted successfully');
-      navigate('/habits');
+      showSuccess('Habit deleted successfully')
+      setTimeout(() => {
+        navigate('/habits');
+      }, 500)
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to delete habit');
-      console.error(err);
+      showError('Failed to delete habit');
     }
   };
 
@@ -61,32 +124,38 @@ function HabitDetails() {
     if (isCompletedToday) return;
 
     try {
-      // First, try to update via API if you have an endpoint
-      await api.post(`/habits/${id}/complete`);
+      // Call API to complete
+      const response = await api.post(`/habits/${id}/complete`);
+      const updatedHabit = response.data.updatedHabit;
 
-      // Update local storage
+      // Update local state
       const newStreak = localStreak + 1;
       setLocalStreak(newStreak);
       setIsCompletedToday(true);
 
-      localStorage.setItem(`habit_streak_${id}`, newStreak.toString());
-      localStorage.setItem(`habit_last_completed_${id}`, new Date().toISOString());
+      // Save to localStorage (consistent with HabitCard)
+      localStorage.setItem(`completed_today_${id}`, 'true');
+      localStorage.setItem(`streak_${id}`, newStreak.toString());
+      localStorage.setItem(`last_completed_${id}`, new Date().toISOString());
 
-      alert('Habit marked as completed for today!');
+      // Update habit data with API response
+      if (updatedHabit) {
+        setHabit(updatedHabit);
+      }
+      showSuccess('Habit mark as completed today');
+
 
     } catch (err) {
-      alert('Failed to mark habit as completed');
-      console.error(err);
+      showError('Failed to mark habit as completed');
     }
   };
 
-  // !TODO 
   const handleResetStreak = () => {
-
     setLocalStreak(0);
     setIsCompletedToday(false);
-    localStorage.setItem(`habit_streak_${id}`, 0);
-    localStorage.removeItem(`habit_last_completed_${id}`);
+    localStorage.setItem(`streak_${id}`, '0');
+    localStorage.setItem(`completed_today_${id}`, 'false');
+    localStorage.removeItem(`last_completed_${id}`);
   };
 
   useEffect(() => {
@@ -94,7 +163,7 @@ function HabitDetails() {
       if (e.key === 'Escape') handleClose();
     };
     window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape)
+    return () => window.removeEventListener('keydown', handleEscape);
   }, []);
 
   // Format date function
@@ -108,6 +177,7 @@ function HabitDetails() {
       day: 'numeric'
     });
   };
+
   if (loading) {
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
@@ -140,11 +210,13 @@ function HabitDetails() {
       </div>
     );
   }
+
   return (
     <div
       className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
       onClick={handleClose}
     >
+      <AlertComponent />
       <div
         className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
         onClick={e => e.stopPropagation()}
@@ -173,12 +245,12 @@ function HabitDetails() {
 
           {/* Category & Status Badges */}
           <div className="flex flex-wrap gap-2">
-            <span className="inline-flex items-center px-3 py-1.5 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
+            <span className="inline-flex items-center px-3 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
               <Tag className="h-3.5 w-3.5 mr-1.5" />
               {habit.category || 'Uncategorized'}
             </span>
             {isCompletedToday && (
-              <span className="inline-flex items-center px-3 py-1.5 bg-green-100 text-green-800 text-sm font-medium rounded-full">
+              <span className="inline-flex items-center px-3 bg-green-100 text-green-800 text-sm font-medium rounded-full">
                 <CheckCircle className="h-3.5 w-3.5 mr-1.5" />
                 Completed Today
               </span>
@@ -192,24 +264,13 @@ function HabitDetails() {
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center p-4 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-2xl mb-4">
               <div className="p-4 bg-white rounded-full shadow-sm">
-                <Flame className="h-10 w-10 text-orange-500" />
+                <Flame className="h-8 w-8 text-orange-500" />
               </div>
             </div>
-            <div className="text-5xl font-bold text-gray-800 mb-2">
+            <div className="text-3xl font-bold text-gray-800 mb-2">
               {localStreak}
             </div>
             <p className="text-gray-600 font-medium">Day Streak</p>
-          </div>
-
-          {/* Stats Grid */}
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            <div className="bg-blue-50 p-4 rounded-xl text-center">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <Flame className="h-5 w-5 text-blue-600" />
-                <h3 className="text-sm font-medium text-blue-800">Current Streak</h3>
-              </div>
-              <div className="text-2xl font-bold text-blue-600">{localStreak}</div>
-            </div>
           </div>
 
           {/* Details Section */}
@@ -228,13 +289,10 @@ function HabitDetails() {
             <div className="bg-white border border-gray-200 p-4 rounded-xl">
               <div className="flex items-center gap-2 mb-2">
                 <Calendar className="h-5 w-5 text-gray-500" />
-                <h3 className="text-sm font-medium text-gray-600">Last Completed</h3>
+                <h3 className="text-sm font-medium text-gray-600">Completion Status</h3>
               </div>
               <p className="font-semibold text-gray-800">
-                {isCompletedToday
-                  ? 'Today'
-                  : formatDate(localStorage.getItem(`habit_last_completed_${id}`) || habit.lastCompleted)
-                }
+                {isCompletedToday ? 'Completed Today ✓' : 'Not completed today'}
               </p>
             </div>
 
@@ -280,7 +338,7 @@ function HabitDetails() {
                   }`}
               >
                 <CheckCircle className="h-5 w-5" />
-                {isCompletedToday ? 'Already Completed Today' : 'Mark as Completed Today'}
+                {isCompletedToday ? 'Completed Today' : 'Mark as Complete'}
               </button>
 
               <button
@@ -310,19 +368,6 @@ function HabitDetails() {
                 Delete
               </button>
             </div>
-          </div>
-
-          {/* Quick Navigation */}
-          <div className="mt-4 pt-4 border-t border-gray-200">
-            <p className="text-sm text-gray-600 text-center">
-              View all habits{' '}
-              <button
-                onClick={() => navigate('/habits')}
-                className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
-              >
-                here
-              </button>
-            </p>
           </div>
         </div>
       </div>

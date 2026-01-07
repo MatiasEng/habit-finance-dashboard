@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     require: true,
-    minlength: 3 
+    minlength: 3
 
   },
   createdAt: {
@@ -28,6 +28,6 @@ const userSchema = new mongoose.Schema({
     require: true,
     default: false
   }
-}, {strict: 'throw'});
+}, { strict: 'throw' });
 
 export default mongoose.model('User', userSchema);

@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import api from '../lib/api';
+import { useAlert } from '../components/hooks/useAlert'
 
 /*
  * To create a habit I need
@@ -13,6 +14,8 @@ function HabitForm() {
   const [category, setCategory] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const { showInfo, showError, showWarning, showSuccess, AlertComponent } = useAlert();
 
   const navigate = useNavigate();
 
@@ -48,10 +51,14 @@ function HabitForm() {
       setTitle('');
       setCategory('');
 
-      alert('Habit Created');
-      navigate('/')
+
+      showSuccess('Habit Created Successfully');
+      setTimeout(() => {
+        navigate('/habits')
+      }, 500);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to create habit");
+      showError('Something went wrong');
     } finally {
       setLoading(false);
     }
@@ -68,6 +75,7 @@ function HabitForm() {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-50 to-blue-50 flex items-center justify-center p-4">
+      <AlertComponent />
       <div className="w-full max-w-md">
         {/* Form Card */}
         <div className="bg-white rounded-2xl shadow-xl p-8">

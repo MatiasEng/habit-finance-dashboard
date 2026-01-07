@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import api from '../lib/api';
 import { Eye, EyeOff } from 'lucide-react';
+import { useAlert } from '../components/hooks/useAlert';
+
 
 function Register() {
 
@@ -12,6 +14,7 @@ function Register() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const { showSuccess, showError, showInfo, showWarning, AlertComponent } = useAlert();
 
   const navigate = useNavigate();
 
@@ -29,23 +32,38 @@ function Register() {
   const handleRegister = async () => {
     setIsLoading(true);
     //validte fields
+
     if (!validatePassword()) {
-      alert('Passwords don\'t match');
+      showError('Passwords don\'t match')
+      setIsLoading(false);
+      return;
+    }
+    if (password.trim().length < 8) {
+      showError('Password needs to be at least 8 characters')
+      setIsLoading(false);
       return;
     }
 
     if (!username || !email || !password) {
-      alert('All fields are required');
+      showError('All fields are require')
+      setIsLoading(false);
       return;
     }
 
     try {
       const response = await api.post('/auth/register', { username, email, password })
-      alert('User created succesfully');
-      navigate('/login');
+
+      showSuccess('Account created successfuly')
+
+      setTimeout(() => {
+        navigate('/login');
+      }, 300)
     } catch (err) {
+      console.log(err);
       if (err.response.data.error.split(' ')[0] == 'E11000') {
-        alert('Email is already register');
+        showError('Email/username is already register')
+      } else {
+        showError('Something went wrong')
       }
       setIsLoading(false);
     } finally {
@@ -63,6 +81,7 @@ function Register() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-gray-900 to-gray-800 p-4">
+      <AlertComponent />
       <div className="w-full max-w-md">
         {/* Register Card */}
         <div className="bg-white rounded-2xl shadow-2xl p-8">

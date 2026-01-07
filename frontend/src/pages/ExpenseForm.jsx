@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../lib/api';
+import { useAlert } from '../components/hooks/useAlert';
 
 function ExpenseForm() {
 
+  const { showError, showInfo, showWarning, showSuccess, AlertComponent } = useAlert();
 
   const [amount, setAmount] = useState('')
   const [category, setCategory] = useState('')
@@ -18,7 +20,12 @@ function ExpenseForm() {
   const handleTrackExpense = async () => {
     // Handle if the fields are empty
     if (!amount || !category || !description || !date) {
-      alert('All fields are required')
+      showError('All fields are required')
+      return;
+    }
+
+    if (category.length < 3) {
+      showError('Category must have at least 3 characters');
       return;
     }
 
@@ -33,14 +40,15 @@ function ExpenseForm() {
         date: date,
       });
 
-      // clean fields
-      setAmount('');
-      setCategory('');
-      setDescription('');
-      setDate(new Date());
+      showSuccess('Expense tracked successfully')
+      setTimeout(() => {
+        navigate('/expenses')
+
+      }, 500);
 
     } catch (err) {
-      console.log(err.response)
+      showError('Something went wrong')
+      console.log(err);
     } finally {
       setIsLoading(false);
     }
@@ -55,6 +63,7 @@ function ExpenseForm() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
+      <AlertComponent />
       <div className="w-full max-w-sm">
         {/* Header */}
         <div className="text-center mb-8">

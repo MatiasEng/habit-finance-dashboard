@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import api from '../../lib/api';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Clock, Hash, X, Calendar, Tag, DollarSign, FileText, Edit, Trash2, ArrowLeft } from 'lucide-react';
+import { useAlert } from '../hooks/useAlert';
 
 
 
@@ -14,6 +15,7 @@ function ExpenseDetails() {
   const [expense, setExpense] = useState(null);
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const { showError, showSuccess, showInfo, showWarning, AlertComponent } = useAlert();
 
   useEffect(() => {
     const fetchExpense = async () => {
@@ -41,11 +43,12 @@ function ExpenseDetails() {
 
     try {
       await api.delete(`/expenses/${id}`);
-      alert('Expense deleted successfully');
-      navigate('/expenses'); // Go back to expenses list
+      showSuccess('Expense deleted successfully');
+      setTimeout(() => {
+        navigate('/expenses'); // Go back to expenses list
+      }, 500)
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to delete expense');
-      console.error(err);
+      showError('Failed to delete expense');
     }
   };
 
@@ -101,11 +104,13 @@ function ExpenseDetails() {
       </div>
     );
   }
+
   return (
     <div
       className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
       onClick={handleClose}
     >
+      <AlertComponent />
       <div
         className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
         onClick={e => e.stopPropagation()}

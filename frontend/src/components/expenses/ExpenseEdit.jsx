@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../../lib/api';
 import { X, Save, DollarSign, Tag, FileText, Calendar } from 'lucide-react';
+import { useAlert } from '../hooks/useAlert';
 
 function ExpenseEdit() {
 
@@ -10,6 +11,7 @@ function ExpenseEdit() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+  const { showError, showSuccess, showInfo, showWarning, AlertComponent } = useAlert();
 
 
   const [formData, setFormData] = useState({
@@ -38,6 +40,7 @@ function ExpenseEdit() {
           date: formattedDate,
         });
       } catch (err) {
+        showError("Coundn't get the expense")
         console.log(err);
       } finally {
         setLoading(false);
@@ -64,12 +67,12 @@ function ExpenseEdit() {
     e.preventDefault();
 
     if (!formData.amount || !formData.category || !formData.description || !formData.date) {
-      alert('At least one field needs to be updated');
+      showWarning('At least one field need to be updated');
       return;
     }
 
     if (parseFloat(formData.amount) <= 0) {
-      alert('The amount must be greater than 0');
+      showWarning('The amount must be greater than 0');
       return;
     }
 
@@ -84,12 +87,16 @@ function ExpenseEdit() {
       }
 
       const response = await api.put(`/expenses/${id}`, updatedData);
-      handleClose();
+
+
+      showSuccess('Habit updated successfully');
+      setTimeout(() => {
+        handleClose();
+      }, 500)
 
 
     } catch (err) {
-      console.log(err.response);
-
+      showError('Something went wrong');
     } finally {
       setSaving(false);
     }
@@ -120,12 +127,13 @@ function ExpenseEdit() {
       className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
       onClick={handleClose}
     >
+      <AlertComponent />
       <div
         className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto"
         onClick={e => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 p-6 rounded-t-2xl">
+        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 pt-4 rounded-t-2xl z-49">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-2xl font-bold text-gray-800">Edit Expense</h1>
             <button

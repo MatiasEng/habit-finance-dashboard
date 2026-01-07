@@ -57,10 +57,12 @@ function HabitsList() {
       <div className="text-center py-12 bg-gray-50 rounded-lg">
         <h3 className="text-lg font-medium text-gray-900 mb-2">No habits yet</h3>
         <p className="text-gray-500 mb-4">Start building your good habits!</p>
-        <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+        <button
+          onClick={() => navigate('/habits/habitform')}
+          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
           Create Your First Habit
         </button>
-      </div>
+      </div >
     );
   }
 

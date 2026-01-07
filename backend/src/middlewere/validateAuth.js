@@ -30,7 +30,6 @@ const loginSchema = Joi.object({
   password: Joi.string()
     .required()
     .min(3)
-    .alphanum()
 
 });
 
@@ -58,11 +57,11 @@ function registerValidation(req, res, next) {
     abortEarly: false,
     stripUnknown: true,
   });
-  
+
   if (error) {
     return res.status(400).json({
       success: false,
-      message: 'Validation failed',
+      message: 'Validation failed here',
       errors: error.details.map(d => d.message)
     })
   }
@@ -78,7 +77,7 @@ function loginValidation(req, res, next) {
     abortEarly: false,
     stripUnknown: true,
   });
-  
+
   if (error) {
     return res.status(400).json({
       success: false,
@@ -90,7 +89,7 @@ function loginValidation(req, res, next) {
   // replace the original data with cleaned version
   req.body = value;
   next();
-  
+
 }
 
 function refreshValidation(req, res, next) {
@@ -99,7 +98,7 @@ function refreshValidation(req, res, next) {
     abortEarly: false,
     stripUnknown: true,
   });
-  
+
   if (error) {
     return res.status(400).json({
       success: false,
@@ -110,7 +109,7 @@ function refreshValidation(req, res, next) {
 
   // replace the original data with cleaned version
   req.body = value;
-  
+
   next();
 }
 
@@ -120,7 +119,7 @@ function logoutValidation(req, res, next) {
     abortEarly: false,
     stripUnknown: true,
   });
-  
+
   if (error) {
     return res.status(400).json({
       success: false,
@@ -132,6 +131,6 @@ function logoutValidation(req, res, next) {
   // replace the original data with cleaned version
   req.body = value;
   next();
-  
+
 }
-export {registerValidation, loginValidation, refreshValidation, logoutValidation};
+export { registerValidation, loginValidation, refreshValidation, logoutValidation };
