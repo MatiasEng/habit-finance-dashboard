@@ -52,6 +52,7 @@ const logoutSchema = Joi.object({
 // --------------------------------------------------
 
 function registerValidation(req, res, next) {
+  console.log('here');
   // Use joi to validate fields
   const { error, value } = registerSchema.validate(req.body, {
     abortEarly: false,
