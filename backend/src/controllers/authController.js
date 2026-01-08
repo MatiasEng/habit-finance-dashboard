@@ -32,9 +32,8 @@ async function registerUser(req, res) {
   } catch (err) {
     res.status(400).json({
       success: false,
-      message: 'User register failed here',
-      error: err.message.split(':')[0],
-      some: err
+      message: 'User register failed',
+      error: err.code || 'REGISTER_ERROR'
     });
 
   }
