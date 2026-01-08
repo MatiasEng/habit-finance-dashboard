@@ -6,7 +6,7 @@ import connectDB from './db/connect.js';
 import cors from 'cors';
 
 // Middleware
-import logger from './middleware/logger.js';
+import logger from './middlewere/logger.js';
 
 // Routes
 import usersRoutes from './routes/userRoutes.js';
