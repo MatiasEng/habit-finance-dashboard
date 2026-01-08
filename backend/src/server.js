@@ -1,27 +1,13 @@
-
-/*
+// Load env FIRST
 import dotenv from 'dotenv';
-dotenv.config();  // Load env FIRST
+dotenv.config();
 
 import express from 'express';
-import connectDB from './db/connect.js';
 import cors from 'cors';
+import connectDB from './db/connect.js';
 
 // Middleware
 import logger from './middlewere/logger.js';
-
-const app = express();
-const PORT = process.env.PORT || 5050;
-
-
-app.use(cors({
-  origin: 'https://frontend-production-3277.up.railway.app',
-  credentials: true,
-}));
-
-app.post('/api/auth/register', (req, res) => {
-  res.json({ ok: true });
-});
 
 // Routes
 import usersRoutes from './routes/userRoutes.js';
@@ -30,69 +16,62 @@ import expensesRoutes from './routes/expenseRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 
+const app = express();
 
-// CORS Configuration - Use environment variable
-const corsOptions = {
-  origin: process.env.FRONTEND_URL || 'https://frontend-production-3277.up.railway.app',
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-  optionsSuccessStatus: 200
-};
+// Railway injects PORT — do NOT hardcode
+const PORT = process.env.PORT || 5050;
 
-// Apply CORS middleware
-app.use(cors(corsOptions));
+/* -------------------- MIDDLEWARE -------------------- */
 
-// Handle preflight requests explicitly
-//app.options('/api/*', cors(corsOptions));  // Only for API routes
-
+// JSON
 app.use(express.json());
+
+// Logger
 app.use(logger);
 
-// Routes
+// CORS — explicit, single origin
+app.use(
+  cors({
+    origin: 'https://frontend-production-3277.up.railway.app',
+    credentials: true,
+  })
+);
+
+/* -------------------- ROUTES -------------------- */
+
+// Health check — MUST work even if DB dies
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'OK' });
+});
+
+// API routes
 app.use('/api/users', usersRoutes);
 app.use('/api/habits', habitsRoutes);
 app.use('/api/expenses', expensesRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/auth', authRoutes);
 
-// Health check endpoint for Railway
-app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'OK', timestamp: new Date() });
-});
-
-// Home Page Landing
+// Root
 app.get('/', (req, res) => {
-  res.send('<h1>Habits and Finance Dashboard</h1>');
+  res.send('Backend running');
 });
 
-// Start Server
-async function startServer() {
-  try {
-    //await connectDB();
-    app.listen(PORT, '0.0.0.0', () => {
-      console.log(`Server Running on PORT ${PORT}`);
-    });
-  } catch (error) {
-    console.error('Failed to start server:', error);
-    process.exit(1);
-  }
-}
-startServer();
+/* -------------------- SERVER START -------------------- */
 
-*/
-
-
-import express from 'express';
-
-const app = express();
-const PORT = process.env.PORT || 5050;
-
-app.get('/health', (req, res) => {
-  res.status(200).json({ ok: true });
-});
-
+// START SERVER FIRST (critical for Railway)
 app.listen(PORT, '0.0.0.0', () => {
-  console.log('LISTENING ON', PORT);
+  console.log(`Server listening on port ${PORT}`);
+});
+
+// THEN connect DB (never block HTTP)
+connectDB()
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => {
+    console.error('MongoDB connection failed:', err.message);
+  });
+
+// Crash visibility
+process.on('unhandledRejection', err => {
+  console.error('Unhandled rejection:', err);
 });
 
