@@ -59,12 +59,7 @@ function Register() {
         navigate('/login');
       }, 300)
     } catch (err) {
-      console.log(err);
-      if (err.response.data.error.split(' ')[0] == 'E11000') {
-        showError('Email/username is already register')
-      } else {
-        showError('Something went wrong')
-      }
+      showError('Something went wrong')
       setIsLoading(false);
     } finally {
       setIsLoading(false);
