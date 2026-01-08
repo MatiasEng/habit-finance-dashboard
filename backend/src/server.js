@@ -1,3 +1,5 @@
+
+/*
 import dotenv from 'dotenv';
 dotenv.config();  // Load env FIRST
 
@@ -30,7 +32,6 @@ import authRoutes from './routes/authRoutes.js';
 
 
 // CORS Configuration - Use environment variable
-/*
 const corsOptions = {
   origin: process.env.FRONTEND_URL || 'https://frontend-production-3277.up.railway.app',
   credentials: true,
@@ -41,7 +42,6 @@ const corsOptions = {
 
 // Apply CORS middleware
 app.use(cors(corsOptions));
-*/
 
 // Handle preflight requests explicitly
 //app.options('/api/*', cors(corsOptions));  // Only for API routes
@@ -49,14 +49,12 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(logger);
 
-/*
 // Routes
 app.use('/api/users', usersRoutes);
 app.use('/api/habits', habitsRoutes);
 app.use('/api/expenses', expensesRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/auth', authRoutes);
-*/
 
 // Health check endpoint for Railway
 app.get('/health', (req, res) => {
@@ -80,5 +78,21 @@ async function startServer() {
     process.exit(1);
   }
 }
-
 startServer();
+
+*/
+
+
+import express from 'express';
+
+const app = express();
+const PORT = process.env.PORT || 5050;
+
+app.get('/health', (req, res) => {
+  res.status(200).json({ ok: true });
+});
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log('LISTENING ON', PORT);
+});
+
