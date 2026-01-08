@@ -48,12 +48,14 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(logger);
 
+/*
 // Routes
 app.use('/api/users', usersRoutes);
 app.use('/api/habits', habitsRoutes);
 app.use('/api/expenses', expensesRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/auth', authRoutes);
+*/
 
 // Health check endpoint for Railway
 app.get('/health', (req, res) => {
