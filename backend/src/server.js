@@ -9,11 +9,14 @@ import cors from 'cors';
 import logger from './middlewere/logger.js';
 
 const app = express();
+const PORT = process.env.PORT || 5050;
 
 app.use(cors({
   origin: 'https://frontend-production-3277.up.railway.app',
   credentials: true,
 }));
+
+app.options('*', cors());
 
 
 // Routes
@@ -23,7 +26,6 @@ import expensesRoutes from './routes/expenseRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 
-const PORT = process.env.PORT || 5050;
 
 // CORS Configuration - Use environment variable
 /*
