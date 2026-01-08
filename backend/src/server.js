@@ -71,11 +71,9 @@ app.get('/', (req, res) => {
 // Start Server
 async function startServer() {
   try {
-    await connectDB();
-
-    console.log('PORT ENV:', process.env.PORT);
+    //await connectDB();
     app.listen(PORT, '0.0.0.0', () => {
-      console.log(`Server PORT ${PORT}`);
+      console.log(`Server Running on PORT ${PORT}`);
     });
   } catch (error) {
     console.error('Failed to start server:', error);
