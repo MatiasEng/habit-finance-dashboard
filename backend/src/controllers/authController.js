@@ -11,6 +11,7 @@ const ACCESS_TOKEN = process.env.ACCESS_TOKEN;
 const REFRESH_TOKEN = process.env.REFRESH_TOKEN;
 
 async function registerUser(req, res) {
+  console.log('REGISTER CONTROLLER HIT');
   try {
     const { username, email, password } = req.body;
 
