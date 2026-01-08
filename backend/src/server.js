@@ -16,8 +16,9 @@ app.use(cors({
   credentials: true,
 }));
 
-app.use(cors());
-
+app.post('/api/auth/register', (req, res) => {
+  res.json({ ok: true });
+});
 
 // Routes
 import usersRoutes from './routes/userRoutes.js';
