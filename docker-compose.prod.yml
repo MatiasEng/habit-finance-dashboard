@@ -1,0 +1,23 @@
+services:
+  mongodb:
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    ports:
+      - "27017:27017"
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    ports:
+      - "5050:5050"
+    environment:
+      PORT: 5050
+      MONGODB_URI: "mongodb://admin:password@mongodb:27017/habit-finance-db?authSource=admin"
+      ACCESS_TOKEN: "test_access_token_123"
+      REFRESH_TOKEN: "test_refresh_token_456"
+      FRONTEND_URL: "http://localhost:5173"
+    depends_on:
+      - mongodb
