@@ -20,23 +20,27 @@ import authRoutes from './routes/authRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-
+app.use(cors({
+  origin: 'https://frontend-production-3277.up.railway.app',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+}));
 /*
 app.use(cors({
   origin: 'http://localhost:5173',
   credentials: true
 })); // Fix for production
 */
-app.use(cors());
+//app.use(cors());
 app.use(express.json());
 app.use(logger);
 
 // Routes
 app.use('/api/users', usersRoutes);
-app.use('/api/habits', habitsRoutes); 
+app.use('/api/habits', habitsRoutes);
 app.use('/api/expenses', expensesRoutes);
 app.use('/api/dashboard', dashboardRoutes);
-app.use('/api/auth', authRoutes); 
+app.use('/api/auth', authRoutes);
 
 // Home Page Landing
 app.get('/', (req, res) => {
