@@ -8,6 +8,12 @@ import cors from 'cors';
 // Middleware
 import logger from './middlewere/logger.js';
 
+app.use(cors({
+  origin: 'https://frontend-production-3277.up.railway.app',
+  credentials: true,
+}));
+
+
 // Routes
 import usersRoutes from './routes/userRoutes.js';
 import habitsRoutes from './routes/habitRoutes.js';
@@ -19,6 +25,7 @@ const app = express();
 const PORT = process.env.PORT || 5050;
 
 // CORS Configuration - Use environment variable
+/*
 const corsOptions = {
   origin: process.env.FRONTEND_URL || 'https://frontend-production-3277.up.railway.app',
   credentials: true,
@@ -29,6 +36,7 @@ const corsOptions = {
 
 // Apply CORS middleware
 app.use(cors(corsOptions));
+*/
 
 // Handle preflight requests explicitly
 //app.options('/api/*', cors(corsOptions));  // Only for API routes
