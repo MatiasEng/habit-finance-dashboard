@@ -1,10 +1,12 @@
 import axios from 'axios';
 
 // Smart URL detection - works for both local and Railway
-const API_BASE_URL = import.meta.env.VITE_API_URL ||
+let API_BASE_URL = import.meta.env.VITE_API_URL ||
   (import.meta.env.MODE === 'development'
     ? 'http://localhost:5050/api'
     : '/api');
+
+API_BASE_URL = 'https://backend-production-b9e7.up.railway.app/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL
