@@ -11,6 +11,7 @@ import logger from './middlewere/logger.js';
 const app = express();
 const PORT = process.env.PORT || 5050;
 
+
 app.use(cors({
   origin: 'https://frontend-production-3277.up.railway.app',
   credentials: true,
@@ -71,6 +72,8 @@ app.get('/', (req, res) => {
 async function startServer() {
   try {
     await connectDB();
+
+    console.log('PORT ENV:', process.env.PORT);
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`Server Running on PORT ${PORT}`);
     });
