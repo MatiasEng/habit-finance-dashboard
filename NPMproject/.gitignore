@@ -1,0 +1,9 @@
+# Dependencies
+node_modules/
+
+# Enviroment Variables
+.env
+
+# Logs
+
+# Runtime data
